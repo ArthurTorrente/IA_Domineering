@@ -1,0 +1,6 @@
+Jour 1
+	Jeu de Nim
+	Domineering Brut Force
+
+Jour 2
+	Domineering MinMax
