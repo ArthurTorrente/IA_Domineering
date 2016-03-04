@@ -8,6 +8,9 @@ public class BoardManagerScript : MonoBehaviour
     GameSettingScript _gameSettingScript;
 
     [SerializeField]
+    UIGameScript _uiGameScript;
+
+    [SerializeField]
     UIPauseScript _uiPauseScript;
 
     [SerializeField]
@@ -35,11 +38,16 @@ public class BoardManagerScript : MonoBehaviour
 
     List<Square> _squares;
 
-    int _nbSquareToogle = 0;
+    int _nbSquareToogle;
 
     bool _horizontalPlayerTurn;
 
-    bool _isGamePaused = false;
+    bool _isGamePaused;
+
+    string _playerOneName;
+
+    string _playerTwoName;
+
 
     public bool IsGamePaused
     {
@@ -47,24 +55,29 @@ public class BoardManagerScript : MonoBehaviour
         set { _isGamePaused = value; }
     }
 
-	// Use this for initialization
-	void Start () 
+    public string PlayerOneName
     {
-        if (_gameSettingScript.PlayerOneOrientation == Orientation.Vertical)
-            _horizontalPlayerTurn = false;
-        else
-            _horizontalPlayerTurn = true;
-
-        CreateBoard();
-	}
-
-    void Awake()
-    {
-       
+        get { return _playerOneName; }
+        set { _playerOneName = value; }
     }
-	
+
+    public string PlayerTwoName
+    {
+        get { return _playerTwoName; }
+        set { _playerTwoName = value; }
+    }
+
 	// Update is called once per frame
 	void Update () 
+    {
+        if (_gameSettingScript.GameState == GameState.Game)
+        {
+            GameLoop();
+            CheckInput();
+        }
+	}
+
+    void GameLoop()
     {
         switch (_gameSettingScript.GameMode)
         {
@@ -83,11 +96,9 @@ public class BoardManagerScript : MonoBehaviour
             default:
                 break;
         }
+    }
 
-        CheckInput();
-	}
-
-    void CreateBoard()
+    public void CreateBoard()
     {
         _squares = new List<Square>();
 
@@ -116,11 +127,45 @@ public class BoardManagerScript : MonoBehaviour
         _mainCamera.orthographicSize = (_gameSettingScript.BoardSize / 2) + 1;
 
         _boardRoot.SetActive(false);
+        _uiGameScript.UiRoot.SetActive(true);
     }
 
-    void DestroyBoard()
+    public void DestroyBoard()
     {
+        if (_squares != null)
+        {
+            foreach (Square square in _squares)
+                Destroy(square.SquareGameObject);
+            _squares = null;
+        }
+    }
 
+    public void LaunchGame()
+    {
+        _gameSettingScript.GameState = GameState.Game;
+
+        DestroyBoard();
+        CreateBoard();
+
+        _nbSquareToogle = 0;
+        _isGamePaused = false;
+
+        if (_gameSettingScript.PlayerOneOrientation == Orientation.Vertical)
+        {
+            _horizontalPlayerTurn = false;
+            _uiGameScript.Horizontal.SetActive(false);
+            _uiGameScript.Vertical.SetActive(true);
+        }
+        else
+        {
+            _horizontalPlayerTurn = true;
+            _uiGameScript.Horizontal.SetActive(true);
+            _uiGameScript.Vertical.SetActive(false);
+        }
+
+        _uiGameScript.SetPlayerText(_playerOneName);
+
+        _boardRoot.SetActive(true);
     }
 
     void PlayerMove()
@@ -142,6 +187,13 @@ public class BoardManagerScript : MonoBehaviour
                 {
                     _nbSquareToogle = 0;
                     _horizontalPlayerTurn = !_horizontalPlayerTurn;
+
+                    if (_uiGameScript.PlayerTurnText.text == _playerOneName)
+                        _uiGameScript.SetPlayerText(_playerTwoName);
+                    else
+                        _uiGameScript.SetPlayerText(_playerOneName);
+
+                    _uiGameScript.SwitchPlayerOrientation();
                 }
             }
         }
@@ -168,7 +220,6 @@ public class BoardManagerScript : MonoBehaviour
 
     void TwoPlayers()
     {
-        PlayerMove();
         PlayerMove();
     }
 
@@ -202,9 +253,14 @@ public class BoardManagerScript : MonoBehaviour
         _boardRoot.SetActive(_isGamePaused);
         _isGamePaused = !_isGamePaused;
         _uiPauseScript.SetPause(_isGamePaused);
+
+        if (_isGamePaused)
+            _gameSettingScript.GameState = GameState.Pause;
+        else
+            _gameSettingScript.GameState = GameState.Game;
     }
 
-    public void ResetGame()
+    public void ResetBoard()
     {
         foreach(Square square in _squares)
         {
@@ -213,6 +269,26 @@ public class BoardManagerScript : MonoBehaviour
                 square.SquareGameObject.layer = _layerEmpty;
                 square.SquareGameObject.GetComponent<Renderer>().material = _emptyMaterial;
             }
+        }
+    }
+
+    public void ResetGameSettings()
+    {
+        _nbSquareToogle = 0;
+
+        _uiGameScript.SetPlayerText(_playerOneName);
+
+        if (_gameSettingScript.PlayerOneOrientation == Orientation.Vertical)
+        {
+            _horizontalPlayerTurn = false;
+            _uiGameScript.Horizontal.SetActive(false);
+            _uiGameScript.Vertical.SetActive(true);
+        }
+        else
+        {
+            _horizontalPlayerTurn = true;
+            _uiGameScript.Horizontal.SetActive(true);
+            _uiGameScript.Vertical.SetActive(false);
         }
     }
 }

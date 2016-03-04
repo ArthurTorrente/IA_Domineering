@@ -18,34 +18,58 @@ public class UIMainMenuScript : MonoBehaviour
     [SerializeField]
     GameObject _boardRoot;
 
+    // Use this for initialization
+    void Start()
+    {
+        _gameSettingScript.GameState = GameState.MainMenu;
+    }
+
     public void launchPlayerVersusAi()
     {
-        _gameSettingScript.GameState = GameState.Game;
         _gameSettingScript.GameMode = GameMode.PlayerVersusAi;
-        _boardManagerScript.BeginGame();
         _uiRoot.SetActive(false);
+
+        if (_gameSettingScript.FirstPlayerToPlay == FirstPlayer.Player)
+        {
+            _boardManagerScript.PlayerOneName = "Player";
+            _boardManagerScript.PlayerTwoName = "Ai";
+        }
+        else
+        {
+            _boardManagerScript.PlayerOneName = "Ai";
+            _boardManagerScript.PlayerTwoName = "Player";
+        }
+
+        _boardManagerScript.LaunchGame();
     }
 
     public void launchPlayerVersusPlayer()
     {
-        _gameSettingScript.GameState = GameState.Game;
         _gameSettingScript.GameMode = GameMode.PlayerVersurPlayer;
-        _boardManagerScript.BeginGame();
         _uiRoot.SetActive(false);
+
+        _boardManagerScript.PlayerOneName = "Player 1";
+        _boardManagerScript.PlayerTwoName = "Player 2";
+
+        _boardManagerScript.LaunchGame();
     }
 
     public void launchAiVersusAi()
     {
-        _gameSettingScript.GameState = GameState.Game;
         _gameSettingScript.GameMode = GameMode.AiVersusAi;
-        _boardManagerScript.BeginGame();
         _uiRoot.SetActive(false);
+
+        _boardManagerScript.PlayerOneName = "Ai 1";
+        _boardManagerScript.PlayerTwoName = "Ai 2";
+
+        _boardManagerScript.LaunchGame();
     }
 
     public void Options()
     {
         _uiRoot.SetActive(false);
         _uiOptionScript.UiRoot.SetActive(true);
+        _gameSettingScript.GameState = GameState.Options;
     }
 
     public void Exit()

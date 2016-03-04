@@ -93,5 +93,6 @@ public class UIOptionsScript : MonoBehaviour
     {
         _uiRoot.SetActive(false);
         _uiMainMenuScript.ActiveMainMenu();
+        _gameSettingScript.GameState = GameState.MainMenu;
     }
 }
