@@ -36,5 +36,7 @@ public enum AiMode
     NegaAlphaBeta,      // 4
     Iteration,          // 5
     KillingMove,        // 6
+    KillingMoveWithTimer,
     Heuristique,        // 7
+    HeuristiqueWithTimer
 }

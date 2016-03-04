@@ -36,7 +36,7 @@ public class BoardManagerScript : MonoBehaviour
     [SerializeField]
     int _layerVertical;
 
-    List<Square> _squares;
+    public List<Square> _squares;
 
     bool _horizontalPlayerTurn;
 
@@ -197,6 +197,7 @@ public class BoardManagerScript : MonoBehaviour
                                 nextSquare.SquareGameObject.layer = _layerHorizontal;
 
                                 _horizontalPlayerTurn = !_horizontalPlayerTurn;
+                                isPlayerOneTurn = !isPlayerOneTurn;
 
                                 if (_uiGameScript.PlayerTurnText.text == _playerOneName)
                                     _uiGameScript.SetPlayerText(_playerTwoName);
@@ -229,6 +230,7 @@ public class BoardManagerScript : MonoBehaviour
                                 nextSquare.SquareGameObject.layer = _layerVertical;
 
                                 _horizontalPlayerTurn = !_horizontalPlayerTurn;
+                                isPlayerOneTurn = !isPlayerOneTurn;
 
                                 if (_uiGameScript.PlayerTurnText.text == _playerOneName)
                                     _uiGameScript.SetPlayerText(_playerTwoName);
@@ -330,8 +332,72 @@ public class BoardManagerScript : MonoBehaviour
         }
     }
 
+    bool m_isPlayerOneTurn = false;
+    public bool isPlayerOneTurn
+    {
+        get { return m_isPlayerOneTurn; }
+        set { m_isPlayerOneTurn = value; }
+    }
+
+    void IATurn()
+    {
+        if(m_isPlayerOneTurn)
+        {
+            switch(_gameSettingScript.AiOneMode)
+            {
+                case AiMode.AlphaBeta:
+                    break;
+
+                case AiMode.Heuristique:
+                    break;
+
+                case AiMode.Iteration:
+                    break;
+
+                case AiMode.KillingMove:
+                    break;
+
+                case AiMode.MinMax:
+                    break;
+
+                case AiMode.NegaAlphaBeta:
+                    break;
+
+                case AiMode.NegaMax:
+                    break;
+
+                case AiMode.HeuristiqueWithTimer:
+                    break;
+
+                case AiMode.KillingMoveWithTimer:
+                    break;
+
+                default:
+                    Application.Quit();
+                    break;
+            }
+        }
+        else
+        {
+            switch(_gameSettingScript.AiTwoMode)
+            {
+
+            }
+        }
+
+        m_isPlayerOneTurn = !m_isPlayerOneTurn;
+    }
+
     void OnePlayer()
     {
+        if(m_isPlayerOneTurn)
+        {
+            PlayerMove();
+        }
+        else
+        {
+            IATurn();
+        }
     }
 
     void TwoPlayers()
@@ -341,6 +407,6 @@ public class BoardManagerScript : MonoBehaviour
 
     void AiVersusAi()
     {
-
+        IATurn();
     }
 }

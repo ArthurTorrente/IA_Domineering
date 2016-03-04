@@ -33,11 +33,13 @@ public class UIMainMenuScript : MonoBehaviour
         {
             _boardManagerScript.PlayerOneName = "Player";
             _boardManagerScript.PlayerTwoName = "Ai";
+            _boardManagerScript.isPlayerOneTurn = true;
         }
         else
         {
             _boardManagerScript.PlayerOneName = "Ai";
             _boardManagerScript.PlayerTwoName = "Player";
+            _boardManagerScript.isPlayerOneTurn = false;
         }
 
         _boardManagerScript.LaunchGame();
@@ -63,6 +65,8 @@ public class UIMainMenuScript : MonoBehaviour
         _boardManagerScript.PlayerTwoName = "Ai 2";
 
         _boardManagerScript.LaunchGame();
+
+        _boardManagerScript.isPlayerOneTurn = true;
     }
 
     public void Options()
