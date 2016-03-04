@@ -219,19 +219,8 @@ public class BoardManagerScript : MonoBehaviour
                     nextSquare.SquareGameObject.GetComponent<Renderer>().material = _horizontalMaterial;
                     nextSquare.SquareGameObject.layer = _layerHorizontal;
 
-                    SwitchPlayerTurn();
-                    SwitchUiGame();
-
                     return new Move(posX, posY, posX, posY + 1);
                 }
-                else
-                {
-                    SetSquare(gameObjectHit, _emptyMaterial, _layerEmpty);
-                }
-            }
-            else
-            {
-                SetSquare(gameObjectHit, _emptyMaterial, _layerEmpty);
             }
         }
         else
@@ -246,19 +235,8 @@ public class BoardManagerScript : MonoBehaviour
                         nextSquare.SquareGameObject.GetComponent<Renderer>().material = _horizontalMaterial;
                         nextSquare.SquareGameObject.layer = _layerHorizontal;
 
-                        SwitchPlayerTurn();
-                        SwitchUiGame();
-
                         return new Move(posX, posY, posX + 1, posY);
                     }
-                    else
-                    {
-                        SetSquare(gameObjectHit, _emptyMaterial, _layerEmpty);
-                    }
-                }
-                else
-                {
-                    SetSquare(gameObjectHit, _emptyMaterial, _layerEmpty);
                 }
             }
         }
@@ -284,7 +262,19 @@ public class BoardManagerScript : MonoBehaviour
                 {
                     int posY; int posX;
                     if (GetPositionXY(gameObjectHit, out posX, out posY))
-                        CheckValideMove(posX, posY, gameObjectHit);
+                    {
+                        Move move = CheckValideMove(posX, posY, gameObjectHit);
+
+                        if(move != null)
+                        {
+                            SwitchPlayerTurn();
+                            SwitchUiGame();
+                        }
+                        else
+                        {
+                            SetSquare(gameObjectHit, _emptyMaterial, _layerEmpty);
+                        }
+                    }
                     // else --> Erreur
                 }
             }
