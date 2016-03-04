@@ -416,7 +416,36 @@ public class BoardManagerScript : MonoBehaviour
         {
             switch(_gameSettingScript.AiTwoMode)
             {
+                case AiMode.AlphaBeta:
+                    break;
 
+                case AiMode.Heuristique:
+                    break;
+
+                case AiMode.Iteration:
+                    break;
+
+                case AiMode.KillingMove:
+                    break;
+
+                case AiMode.MinMax:
+                    break;
+
+                case AiMode.NegaAlphaBeta:
+                    break;
+
+                case AiMode.NegaMax:
+                    break;
+
+                case AiMode.HeuristiqueWithTimer:
+                    break;
+
+                case AiMode.KillingMoveWithTimer:
+                    break;
+
+                default:
+                    Application.Quit();
+                    break;
             }
         }
 
