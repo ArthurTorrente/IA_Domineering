@@ -165,6 +165,107 @@ public class BoardManagerScript : MonoBehaviour
         _boardRoot.SetActive(true);
     }
 
+    bool GetPositionXY(GameObject gameObject, out int posX, out int posY)
+    {
+        int indexSquare;
+        if (int.TryParse(gameObject.name, out indexSquare))
+        {
+            posY = indexSquare % _gameSettingScript.BoardSize;
+            posX = indexSquare / _gameSettingScript.BoardSize;
+
+            return true;
+        }
+        else
+        {
+            posX = -1;
+            posY = -1;
+
+            return false;
+        }
+    }
+
+    void SetSquare(GameObject gameObject, Material material, int layer)
+    {
+        gameObject.GetComponent<Renderer>().material = material;
+        gameObject.layer = layer;
+    }
+
+    void SwitchPlayerTurn()
+    {
+        _horizontalPlayerTurn = !_horizontalPlayerTurn;
+        isPlayerOneTurn = !isPlayerOneTurn;
+    }
+
+    void SwitchUiGame()
+    {
+        if (_uiGameScript.PlayerTurnText.text == _playerOneName)
+            _uiGameScript.SetPlayerText(_playerTwoName);
+        else
+            _uiGameScript.SetPlayerText(_playerOneName);
+
+        _uiGameScript.SwitchPlayerOrientation();
+    }
+
+    Move CheckValideMove(int posX, int posY, GameObject gameObjectHit)
+    {
+        if (_horizontalPlayerTurn)
+        {
+            if (posY < _gameSettingScript.BoardSize - 1)
+            {
+                Square nextSquare = _squares[(posX * _gameSettingScript.BoardSize) + posY + 1];
+
+                if (nextSquare.SquareGameObject.layer == _layerEmpty)
+                {
+                    nextSquare.SquareGameObject.GetComponent<Renderer>().material = _horizontalMaterial;
+                    nextSquare.SquareGameObject.layer = _layerHorizontal;
+
+                    SwitchPlayerTurn();
+                    SwitchUiGame();
+
+                    return new Move(posX, posY, posX, posY + 1);
+                }
+                else
+                {
+                    SetSquare(gameObjectHit, _emptyMaterial, _layerEmpty);
+                }
+            }
+            else
+            {
+                SetSquare(gameObjectHit, _emptyMaterial, _layerEmpty);
+            }
+        }
+        else
+        {
+            {
+                if (posX < _gameSettingScript.BoardSize - 1)
+                {
+                    Square nextSquare = _squares[((posX + 1) * _gameSettingScript.BoardSize) + posY];
+
+                    if (nextSquare.SquareGameObject.layer == _layerEmpty)
+                    {
+                        nextSquare.SquareGameObject.GetComponent<Renderer>().material = _horizontalMaterial;
+                        nextSquare.SquareGameObject.layer = _layerHorizontal;
+
+                        SwitchPlayerTurn();
+                        SwitchUiGame();
+
+                        return new Move(posX, posY, posX + 1, posY);
+                    }
+                    else
+                    {
+                        SetSquare(gameObjectHit, _emptyMaterial, _layerEmpty);
+                    }
+                }
+                else
+                {
+                    SetSquare(gameObjectHit, _emptyMaterial, _layerEmpty);
+                }
+            }
+        }
+
+        return null;
+    }
+
     void PlayerMove()
     {
         if (Input.GetMouseButtonDown(0))
@@ -176,87 +277,21 @@ public class BoardManagerScript : MonoBehaviour
             {
                 GameObject gameObjectHit = hit.collider.gameObject;
 
-                SetEmptySquare(gameObjectHit);
+                SetSquareLayerAndMaterial(gameObjectHit);
 
                 int indexSquare;
-                Square nextSquare;
-                if(int.TryParse(gameObjectHit.name, out indexSquare))
+                if (int.TryParse(gameObjectHit.name, out indexSquare))
                 {
-                    int posY = indexSquare % _gameSettingScript.BoardSize;
-                    int posX = indexSquare / _gameSettingScript.BoardSize;
-
-                    if (_horizontalPlayerTurn)
-                    {
-                        if (posY < _gameSettingScript.BoardSize - 1)
-                        {
-                            nextSquare = _squares[(posX * _gameSettingScript.BoardSize) + posY + 1];
-
-                            if (nextSquare.SquareGameObject.layer == _layerEmpty)
-                            {
-                                nextSquare.SquareGameObject.GetComponent<Renderer>().material = _horizontalMaterial;
-                                nextSquare.SquareGameObject.layer = _layerHorizontal;
-
-                                _horizontalPlayerTurn = !_horizontalPlayerTurn;
-                                isPlayerOneTurn = !isPlayerOneTurn;
-
-                                if (_uiGameScript.PlayerTurnText.text == _playerOneName)
-                                    _uiGameScript.SetPlayerText(_playerTwoName);
-                                else
-                                    _uiGameScript.SetPlayerText(_playerOneName);
-
-                                _uiGameScript.SwitchPlayerOrientation();
-                            }
-                            else
-                            {
-                                gameObjectHit.GetComponent<Renderer>().material = _emptyMaterial;
-                                gameObjectHit.layer = _layerEmpty;
-                            }
-                        }
-                        else
-                        {
-                            gameObjectHit.GetComponent<Renderer>().material = _emptyMaterial;
-                            gameObjectHit.layer = _layerEmpty;
-                        }
-                    }
-                    else
-                    {
-                        if(posX < _gameSettingScript.BoardSize - 1)
-                        {
-                            nextSquare = _squares[((posX + 1) * _gameSettingScript.BoardSize) + posY];
-
-                            if (nextSquare.SquareGameObject.layer == _layerEmpty)
-                            {
-                                nextSquare.SquareGameObject.GetComponent<Renderer>().material = _verticalMaterial;
-                                nextSquare.SquareGameObject.layer = _layerVertical;
-
-                                _horizontalPlayerTurn = !_horizontalPlayerTurn;
-                                isPlayerOneTurn = !isPlayerOneTurn;
-
-                                if (_uiGameScript.PlayerTurnText.text == _playerOneName)
-                                    _uiGameScript.SetPlayerText(_playerTwoName);
-                                else
-                                    _uiGameScript.SetPlayerText(_playerOneName);
-
-                                _uiGameScript.SwitchPlayerOrientation();
-                            }
-                            else
-                            {
-                                gameObjectHit.GetComponent<Renderer>().material = _emptyMaterial;
-                                gameObjectHit.layer = _layerEmpty;
-                            }
-                        }
-                        else
-                        {
-                            gameObjectHit.GetComponent<Renderer>().material = _emptyMaterial;
-                            gameObjectHit.layer = _layerEmpty;
-                        }
-                    }
+                    int posY; int posX;
+                    if (GetPositionXY(gameObjectHit, out posX, out posY))
+                        CheckValideMove(posX, posY, gameObjectHit);
+                    // else --> Erreur
                 }
             }
         }
     }
 
-    void SetEmptySquare(GameObject gameObjectHit)
+    void SetSquareLayerAndMaterial(GameObject gameObjectHit)
     {
         if (_horizontalPlayerTurn)
         {
