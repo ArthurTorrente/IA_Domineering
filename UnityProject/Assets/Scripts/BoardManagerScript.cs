@@ -268,21 +268,6 @@ public class BoardManagerScript : MonoBehaviour
         }
     }
 
-    void OnePlayer()
-    {
-        PlayerMove();
-    }
-
-    void TwoPlayers()
-    {
-        PlayerMove();
-    }
-
-    void AiVersusAi()
-    {
-
-    }
-
     public void BeginGame()
     {
         _boardRoot.SetActive(true);
@@ -343,5 +328,19 @@ public class BoardManagerScript : MonoBehaviour
             _uiGameScript.Horizontal.SetActive(true);
             _uiGameScript.Vertical.SetActive(false);
         }
+    }
+
+    void OnePlayer()
+    {
+    }
+
+    void TwoPlayers()
+    {
+        PlayerMove();
+    }
+
+    void AiVersusAi()
+    {
+
     }
 }
