@@ -38,8 +38,6 @@ public class BoardManagerScript : MonoBehaviour
 
     List<Square> _squares;
 
-    int _nbSquareToogle;
-
     bool _horizontalPlayerTurn;
 
     bool _isGamePaused;
@@ -147,7 +145,6 @@ public class BoardManagerScript : MonoBehaviour
         DestroyBoard();
         CreateBoard();
 
-        _nbSquareToogle = 0;
         _isGamePaused = false;
 
         if (_gameSettingScript.PlayerOneOrientation == Orientation.Vertical)
@@ -181,19 +178,77 @@ public class BoardManagerScript : MonoBehaviour
 
                 SetEmptySquare(gameObjectHit);
 
-                ++_nbSquareToogle;
-
-                if(_nbSquareToogle >= 2)
+                int indexSquare;
+                Square nextSquare;
+                if(int.TryParse(gameObjectHit.name, out indexSquare))
                 {
-                    _nbSquareToogle = 0;
-                    _horizontalPlayerTurn = !_horizontalPlayerTurn;
+                    int posY = indexSquare % _gameSettingScript.BoardSize;
+                    int posX = indexSquare / _gameSettingScript.BoardSize;
 
-                    if (_uiGameScript.PlayerTurnText.text == _playerOneName)
-                        _uiGameScript.SetPlayerText(_playerTwoName);
+                    if (_horizontalPlayerTurn)
+                    {
+                        if (posY < _gameSettingScript.BoardSize - 1)
+                        {
+                            nextSquare = _squares[(posX * _gameSettingScript.BoardSize) + posY + 1];
+
+                            if (nextSquare.SquareGameObject.layer == _layerEmpty)
+                            {
+                                nextSquare.SquareGameObject.GetComponent<Renderer>().material = _horizontalMaterial;
+                                nextSquare.SquareGameObject.layer = _layerHorizontal;
+
+                                _horizontalPlayerTurn = !_horizontalPlayerTurn;
+
+                                if (_uiGameScript.PlayerTurnText.text == _playerOneName)
+                                    _uiGameScript.SetPlayerText(_playerTwoName);
+                                else
+                                    _uiGameScript.SetPlayerText(_playerOneName);
+
+                                _uiGameScript.SwitchPlayerOrientation();
+                            }
+                            else
+                            {
+                                gameObjectHit.GetComponent<Renderer>().material = _emptyMaterial;
+                                gameObjectHit.layer = _layerEmpty;
+                            }
+                        }
+                        else
+                        {
+                            gameObjectHit.GetComponent<Renderer>().material = _emptyMaterial;
+                            gameObjectHit.layer = _layerEmpty;
+                        }
+                    }
                     else
-                        _uiGameScript.SetPlayerText(_playerOneName);
+                    {
+                        if(posX < _gameSettingScript.BoardSize - 1)
+                        {
+                            nextSquare = _squares[((posX + 1) * _gameSettingScript.BoardSize) + posY];
 
-                    _uiGameScript.SwitchPlayerOrientation();
+                            if (nextSquare.SquareGameObject.layer == _layerEmpty)
+                            {
+                                nextSquare.SquareGameObject.GetComponent<Renderer>().material = _verticalMaterial;
+                                nextSquare.SquareGameObject.layer = _layerVertical;
+
+                                _horizontalPlayerTurn = !_horizontalPlayerTurn;
+
+                                if (_uiGameScript.PlayerTurnText.text == _playerOneName)
+                                    _uiGameScript.SetPlayerText(_playerTwoName);
+                                else
+                                    _uiGameScript.SetPlayerText(_playerOneName);
+
+                                _uiGameScript.SwitchPlayerOrientation();
+                            }
+                            else
+                            {
+                                gameObjectHit.GetComponent<Renderer>().material = _emptyMaterial;
+                                gameObjectHit.layer = _layerEmpty;
+                            }
+                        }
+                        else
+                        {
+                            gameObjectHit.GetComponent<Renderer>().material = _emptyMaterial;
+                            gameObjectHit.layer = _layerEmpty;
+                        }
+                    }
                 }
             }
         }
@@ -274,8 +329,6 @@ public class BoardManagerScript : MonoBehaviour
 
     public void ResetGameSettings()
     {
-        _nbSquareToogle = 0;
-
         _uiGameScript.SetPlayerText(_playerOneName);
 
         if (_gameSettingScript.PlayerOneOrientation == Orientation.Vertical)
